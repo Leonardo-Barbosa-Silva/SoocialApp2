@@ -1,0 +1,11 @@
+{
+  "name": "soocialapp2",
+  "version": "1.0.0",
+  "description": "SoocialApp ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leonarod B. Silva",
+  "license": "ISC"
+}
