@@ -2,10 +2,11 @@
   "name": "server",
   "version": "1.0.0",
   "description": "SoocialApp server",
-  "main": "index.js",
+  "main": "./src/server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "node server.js",
+    "server-dev": "nodemon ./src/server.js"
   },
   "author": "Leonardo B. Silva",
   "license": "ISC",
@@ -24,5 +25,8 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.4",
     "multer-gridfs-storage": "^5.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
