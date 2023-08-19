@@ -4,7 +4,8 @@
   "description": "SoocialApp ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "node ./server/server.js",
+    "server-dev": "nodemon ./server/src/server.js"
   },
   "author": "Leonarod B. Silva",
   "license": "ISC"
