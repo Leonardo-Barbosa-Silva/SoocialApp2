@@ -6,7 +6,9 @@ dotenv.config()
 
 
 async function tokenGenerate(userID) {
-    return await jwt.sign({ id: userID }, process.env.JWT_SECRET)
+    return jwt.sign({ id: userID }, process.env.JWT_SECRET, {
+        expiresIn: "30d"
+    })
 }
 
 export default {
@@ -72,9 +74,9 @@ export default {
                     location: userCreated.location,
                     occupation: userCreated.ocupation,
                     viewedProfile: userCreated.viewedProfile,
-                    impressions: userCreated.impressions,
-                    token: await tokenGenerate(userCreated._id)
-                }
+                    impressions: userCreated.impressions
+                },
+                token: await tokenGenerate(userCreated._id)
             })
 
         } catch (error) {
@@ -114,10 +116,10 @@ export default {
                     picturePath: user.picturePath,
                     friends: user.friends,
                     occupation: user.occupation,
-                    viwedProfile: user.viwedProfile,
-                    impressions: user.impressions,
-                    token: await tokenGenerate(user._id)
-                }
+                    viewedProfile: user.viewedProfile,
+                    impressions: user.impressions
+                },
+                token: await tokenGenerate(user._id)
             })
 
         } catch (error) {
@@ -126,12 +128,177 @@ export default {
         }
     },
 
-    //@desc Get user data
+    //@desc Get own data
     //@route GET v1/api/users/me
     //@access Private
-    user: async (req, res) => {
-        res.status(200).json({
-            item: "User data"
-        })
+    getMe: async (req, res) => {
+        try {
+            const user = req.user
+
+            if (!user._id) {
+                return res.status(400).json({ message: "User not found" })
+            }
+
+            res.status(200).json({
+                message: "Successfully get user data",
+                item: {
+                    _id: user._id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    location: user.location,
+                    picturePath: user.picturePath,
+                    friends: user.friends,
+                    occupation: user.occupation,
+                    viewedProfile: user.viewedProfile,
+                    impressions: user.impressions
+                }
+            })
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: "Internal server error" })
+        }
+    },
+    
+    //@desc Get user data
+    //@route GET v1/api/users/:id
+    //@access Private
+    getUserData: async (req, res) => {
+        try {
+            const { id } = req.params
+
+            const user = await UsersModel.findById(id).select('-password')
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found" })
+            }
+
+            res.status(200).json({
+                message: "Successfully get user data",
+                item: {
+                    _id: user._id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    location: user.location,
+                    picturePath: user.picturePath,
+                    friends: user.friends,
+                    occupation: user.occupation,
+                    viewedProfile: user.viewedProfile,
+                    impressions: user.impressions
+                }
+            })
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: "Internal server error" })
+        }
+    },
+
+    //@desc Get user friends
+    //@route GET v1/api/users/:id/friends
+    //@access Private
+    getUserFriends: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const user = await UsersModel.findById(id).select('-password');
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found" })
+            }
+
+            const friends = await Promise.all(
+                user.friends.map( id => UsersModel.findById(id).select('-password').select('-email') )
+            )
+
+            res.status(200).json({
+                message: "Successfully get user friends",
+                item: friends
+            })
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: "Internal server error" })
+        }
+    },
+
+    //@desc Add or remove user friend
+    //@route PATCH v1/api/users/me/friends/:friendId
+    //@access Private
+    addRemoveFriend: async (req, res) => {
+        try {
+            const user = req.user
+
+            if (!user._id) {
+                return res.status(400).json({ message: "User not found" })
+            }
+
+            const friend = await UsersModel.findById(req.params.friendId)
+
+            if (!friend._id) {
+                return res.status(400).json({ message: "Friend not found" })
+            }
+
+            if (user.friends.includes(friend._id)) {
+                await UsersModel.updateOne(
+                    { 
+                        _id: user._id 
+                    },
+                    {
+                        $pull: {
+                            friends: friend._id
+                        }
+                    }
+                )
+                await UsersModel.updateOne(
+                    { 
+                        _id: friend._id
+                    },
+                    {
+                        $pull: {
+                            friends: user._id
+                        }
+                    }
+                )
+            } else {
+                await UsersModel.updateOne(
+                    { 
+                        _id: user._id 
+                    },
+                    {
+                        $addToSet: {
+                            friends: friend._id
+                        }
+                    }
+                )
+                await UsersModel.updateOne(
+                    { 
+                        _id: friend._id 
+                    },
+                    {
+                        $addToSet: {
+                            friends: user._id
+                        }
+                    }
+                )
+            }
+
+            const userUpdated = await UsersModel.findById(user._id)
+
+            const friends = await Promise.all(
+                userUpdated.friends.map( id => UsersModel.findById(id).select('-password').select('-email') )
+            )
+
+            res.status(200).json({
+                message: "Successfully added or removed user's friend",
+                item: friends
+            })
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: "Internal server error" });
+        }
     }
 }
