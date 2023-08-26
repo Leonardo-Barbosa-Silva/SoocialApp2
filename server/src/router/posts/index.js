@@ -9,15 +9,17 @@ const {
     getMyPosts,
     getMyFeed,
     getUserPosts,
+    likePost
 } = postsControllers
 
 
 router.get('/my', autho, getMyPosts)
 router.get('/my/feed', autho, getMyFeed)
-//router.get('/user/:userId', autho, getUserPosts)
-
+router.get('/user/:userId', autho, getUserPosts)
 router.post('/create', autho, create)
-//router.patch('/:postId/likes', autho, likePost)
+router.patch('/likes/:postId', autho, likePost)
+
+
 
 
 export default router;
