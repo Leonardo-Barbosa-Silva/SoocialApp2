@@ -17,7 +17,7 @@ import {
     Typography,
     useMediaQuery
 } from "@mui/material";
-import { setMode } from "features/user/userSlice";
+import { reset, setMode } from "features/user/userSlice";
 
 
 function NavBar() {
@@ -84,14 +84,18 @@ function NavBar() {
                     </IconButton>
                     <FormControl
                         variant="standard"
-                        value="Leonardo Barbosa Silva"
                         sx={{
                             width: "160px",
                             borderRadius: "5px"
                         }}
                     >
                         <Select
-                            value="Leonardo Barbosa Silva"
+                            value={user ? user.firstName + ' ' + user.lastName : ''}
+                            onChange={ (e) => {
+                                if (e.target.value === "logout") {
+                                    dispatch(reset())
+                                }
+                            }}
                             sx={{
                                 backgroundColor: palette.neutral.light,
                                 width: "100%",
@@ -103,10 +107,10 @@ function NavBar() {
                             }}
                             input={<InputBase />}
                         >
-                            <MenuItem value="Leonardo Barbosa Silva">
-                                <Typography>Leonardo Barbosa Silva</Typography>
+                            <MenuItem value={user.firstName + ' ' + user.lastName}>
+                                <Typography>{user.firstName + ' ' + user.lastName}</Typography>
                             </MenuItem>
-                            <MenuItem onClick={() => console.log('clicou logout')}>
+                            <MenuItem value="logout">
                                 <Typography>Logout</Typography>
                             </MenuItem>
                         </Select>

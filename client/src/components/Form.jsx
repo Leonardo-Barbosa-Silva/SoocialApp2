@@ -10,9 +10,9 @@ import {
     Typography
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import Dropzone from 'react-dropzone';
 import { EditOffOutlined } from '@mui/icons-material';
+import { loginUser, registerUser } from 'features/user/userService';
 
 
 
@@ -49,22 +49,40 @@ const initialValuesLogin = {
 function Form() {
     const [ pageType, setPageType ] = useState('login')
 
-    const initialValues = pageType === "login" ? { ...initialValuesLogin } : { ...initialValuesRegister }
-    const validationSchema = pageType === "login" ? { ...loginSchema } : { ...registerSchema }
-
     const { palette } = useTheme()
     const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const isNonMobileScreen = useMediaQuery("(min-width=600px)")
 
-    const handleFormSubmit = (values, onSubmitProps) => {}
+    const login = (values, formikProps) => {
+        dispatch(loginUser(values))
+        formikProps.resetForm()
+    }
+
+    const register = (values, formikProps) => {
+        const formData = new FormData()
+
+        for (let key in values) {
+            formData.append(key, values[key])
+        }
+        formData.append('picturePath', values.picture.name)
+
+        dispatch(registerUser(formData))
+        formikProps.resetForm()
+    }
+
+    const handleFormSubmit = (values, formikProps) => {
+        if (pageType === "login") {
+            login(values, formikProps)
+        } else if (pageType === "register") {
+            register(values, formikProps)
+        }
+    }
 
 
     return (
         <Formik
             onSubmit={handleFormSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
+            initialValues={pageType === "login" ? initialValuesLogin : initialValuesRegister}
+            validationSchema={pageType === "login" ? loginSchema : registerSchema }
         >
             {({
                 values,
@@ -82,11 +100,12 @@ function Form() {
                         gap="30px"
                         gridTemplateColumns="repeat(4, minmax(0, 1fr))"
                     >
-                        {pageType === "register" ? (
+                        {pageType === "register" && (
                             <>
                                 <TextField 
                                     label="First Name"
                                     name="firstName"
+                                    type="text"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     value={values.firstName}
@@ -97,6 +116,7 @@ function Form() {
                                 <TextField 
                                     label="Last Name"
                                     name="lastName"
+                                    type="text"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     value={values.lastName}
@@ -105,23 +125,25 @@ function Form() {
                                     sx={{ gridColumn: "span 2" }}
                                 />
                                 <TextField 
-                                    label="Location"
-                                    name="location"
+                                    label="Email"
+                                    name="email"
+                                    type="email"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
-                                    value={values.location}
-                                    error={Boolean(touched.location) && Boolean(errors.location)}
-                                    helperText={touched.location && errors.location}
+                                    value={values.email}
+                                    error={Boolean(touched.email) && Boolean(errors.email)}
+                                    helperText={touched.email && errors.email}
                                     sx={{ gridColumn: "span 4" }}
                                 />
-                                <TextField 
-                                    label="Occupation"
-                                    name="occupation"
+                                <TextField
+                                    label="Password"
+                                    name="password"
+                                    type="password"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
-                                    value={values.occupation}
-                                    error={Boolean(touched.occupation) && Boolean(errors.occupation)}
-                                    helperText={touched.occupation && errors.occupation}
+                                    value={values.password}
+                                    error={Boolean(touched.password) && Boolean(errors.password)}
+                                    helperText={touched.password && errors.password}
                                     sx={{ gridColumn: "span 4" }}
                                 />
                                 <Dropzone
@@ -161,12 +183,37 @@ function Form() {
                                         </Box>
                                     )}
                                 </Dropzone>
+                                <TextField 
+                                    label="Location"
+                                    name="location"
+                                    type="text"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    value={values.location}
+                                    error={Boolean(touched.location) && Boolean(errors.location)}
+                                    helperText={touched.location && errors.location}
+                                    sx={{ gridColumn: "span 4" }}
+                                />
+                                <TextField 
+                                    label="Occupation"
+                                    name="occupation"
+                                    type="text"
+                                    onBlur={handleBlur}
+                                    onChange={handleChange}
+                                    value={values.occupation}
+                                    error={Boolean(touched.occupation) && Boolean(errors.occupation)}
+                                    helperText={touched.occupation && errors.occupation}
+                                    sx={{ gridColumn: "span 4" }}
+                                />
                             </>
-                        ) : (
+                        )}
+                        
+                        { pageType === "login" && (
                             <>
                                 <TextField 
                                     label="Email"
                                     name="email"
+                                    type="email"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     value={values.email}
@@ -177,6 +224,7 @@ function Form() {
                                 <TextField 
                                     label="Password"
                                     name="password"
+                                    type="password"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     value={values.password}
@@ -204,12 +252,10 @@ function Form() {
 
                             <Typography
                                 onClick={() => {
-                                    resetForm(
-                                        { 
-                                            values: pageType === "login" ? initialValuesLogin : initialValuesRegister
-                                        }
-                                    )
-                                    setPageType(pageType === "login" ? "register" : "login")
+                                    setPageType( prevPageType => {
+                                        resetForm()
+                                        return prevPageType === "login" ? "register" : "login"
+                                    })
                                 }}
                                 sx={{
                                     textDecoration: "underline",

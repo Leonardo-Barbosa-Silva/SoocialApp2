@@ -1,10 +1,21 @@
 import { useTheme, Box, Typography, useMediaQuery } from '@mui/material'
 import Form from 'components/Form'
+import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 function AuthPage() {
-
+    const { isLogged } = useSelector( state => state.users )
     const { palette } = useTheme()
-    const isNonMobileScreen = useMediaQuery("(min-width='600px')")
+    const navigate = useNavigate()
+
+    useEffect( () => {
+        if (isLogged) {
+            navigate('/home')
+        } else {
+            navigate('/')
+        }
+    }, [isLogged])
 
     return (
         <Box>
@@ -37,7 +48,7 @@ function AuthPage() {
             >
                 <Box
                     height="100%"
-                    width={isNonMobileScreen ? "65%" : "75%"}
+                    width="70%"
                     p="30px"
                     borderRadius="10px"
                     backgroundColor={palette.background.alt}
@@ -47,6 +58,7 @@ function AuthPage() {
                     </Typography>
 
                     <Form />
+
                 </Box>
             </Box>
         </Box>

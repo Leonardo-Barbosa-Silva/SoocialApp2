@@ -16,6 +16,8 @@ export default {
     // @route POST v1/api/users/auth/register
     // @access Public
     register: async (req, res) => {
+        console.log(req.body)
+        console.log(req.files)
         try {
             const {
                 firstName,
@@ -89,6 +91,8 @@ export default {
     //@route POST v1/api/users/auth/login
     //@access Public
     login: async (req, res) => {
+        console.log(req.body)
+        
         try {
             const { email, password } = req.body
 
@@ -152,7 +156,7 @@ export default {
                     occupation: user.occupation,
                     viewedProfile: user.viewedProfile,
                     impressions: user.impressions
-                }
+                },
             })
 
         } catch (error) {
@@ -300,5 +304,5 @@ export default {
             console.log(error);
             res.status(500).json({ error: "Internal server error" });
         }
-    }
+    },
 }
