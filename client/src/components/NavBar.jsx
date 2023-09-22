@@ -14,8 +14,7 @@ import {
     InputBase,
     MenuItem,
     Select,
-    Typography,
-    useMediaQuery
+    Typography
 } from "@mui/material";
 import { reset, setMode } from "features/user/userSlice";
 
@@ -24,8 +23,6 @@ function NavBar() {
     const user = useSelector( state => state.users.user )
     const dispatch = useDispatch()
     const { palette } = useTheme()
-    const isNonMobileScreen = useMediaQuery("(min-width: 1000px)")
-    const fullName = `Leonardo Barbosa Silva`
 
     return (
         <Box
@@ -76,10 +73,10 @@ function NavBar() {
                             <LightMode />
                         )}
                     </IconButton>
-                    <IconButton onClick={() => {console.log('clicou mensagem')}}>
+                    <IconButton>
                         <Message />
                     </IconButton>
-                    <IconButton onClick={() => {console.log('clicou notificações')}}>
+                    <IconButton>
                         <Notifications />
                     </IconButton>
                     <FormControl
