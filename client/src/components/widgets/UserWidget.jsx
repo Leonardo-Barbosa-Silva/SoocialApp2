@@ -1,5 +1,12 @@
 import { IconButton, useTheme } from '@mui/material';
-import { EditOutlined, LinkedIn, LocationCity, LocationOnOutlined, ManageAccountsOutlined, Twitter, Work, WorkOutlineOutlined } from '@mui/icons-material';
+import {
+    EditOutlined,
+    LinkedIn,
+    LocationOnOutlined,
+    ManageAccountsOutlined,
+    Twitter,
+    WorkOutlineOutlined
+} from '@mui/icons-material';
 import { Box, Divider, Typography } from '@mui/material';
 import UserImage from 'components/UserImage';
 
@@ -22,10 +29,10 @@ const UserWidget = ({ user }) => {
     return (
         <Box
             sx={{
-                width: "30%",
+                width: "26%",
                 minWidth: "300px",
                 height: "fit-content",
-                backgroundColor: "#000",
+                backgroundColor: palette.background.alt,
                 borderRadius: "15px",
                 padding: "20px"
             }}

@@ -31,7 +31,7 @@ function HomePage() {
                         gap: "40px" 
                     }}
                 >
-                    <InputPost />
+                    <InputPost user={user} />
                     <TimeLine />
                 </Box>
 
