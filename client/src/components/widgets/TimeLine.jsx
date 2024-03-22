@@ -1,20 +1,16 @@
 import { Box } from '@mui/material';
+import Post from 'components/Post';
 
 
 
-const TimeLine = () => {
+const TimeLine = ({ user, posts }) => {
 
     return (
-        <Box
-            sx={{
-                height: "400px",
-                backgroundColor: "#000",
-                borderRadius: "15px"
-            }}
-        >
-            
-            
-        </Box>
+        <>
+            {posts.map( post => (
+                <Post user={user} post={post} key={post._id}/>
+            ))}
+        </>
     )
 }
 

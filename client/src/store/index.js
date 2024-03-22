@@ -9,11 +9,12 @@ import {
 } from 'redux-persist';
 
 
-export const store = (usersReducersPersisted) => (
+export const store = (userReducersPersisted, postReducersPersisted) => (
     configureStore(
         {
             reducer: {
-                users: usersReducersPersisted
+                users: userReducersPersisted,
+                posts: postReducersPersisted
             },
             middleware: (getDefaultMiddleware) => (
                 getDefaultMiddleware({

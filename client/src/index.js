@@ -9,12 +9,14 @@ import {
 import storage from 'redux-persist/lib/storage';
 import { PersistGate } from "redux-persist/integration/react";
 import { store } from './store/index.js';
-import usersReducers from './features/user/userSlice.js';
+import userReducers from './features/user/userSlice.js';
+import postReducers from './features/post/postSlice.js';
 
 
 
-const usersReducersPersisted = persistReducer({ key: 'root', storage, version: 1 }, usersReducers)
-const storeConfigured = store(usersReducersPersisted)
+const userReducersPersisted = persistReducer({ key: 'root-user', storage, version: 1 }, userReducers)
+const postReducersPersisted = persistReducer({ key: 'root-post', storage, version: 1 }, postReducers)
+const storeConfigured = store(userReducersPersisted, postReducersPersisted)
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

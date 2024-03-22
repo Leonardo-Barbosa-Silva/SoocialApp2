@@ -14,7 +14,7 @@ const initialState = {
     message: ''
 }
 
-const { loginUser, registerUser, getMe } = userService
+const { loginUser, registerUser, getMe, getMyFeed } = userService
 
 
 export const usersSlice = createSlice({
@@ -99,12 +99,24 @@ export const usersSlice = createSlice({
                 state.isLoading = false
                 state.message = action.payload
             })
-            .addCase(getMe.pending, (state, action) => {
+            .addCase(getMe.pending, (state) => {
                 state.user = state.user || null
                 state.token = state.token || null
                 state.isLogged = state.isLogged || false
                 state.isRegistered = state.isRegistered || false
                 state.isError = false
+                state.isLoading = true
+                state.message = ''
+            })
+            .addCase(getMyFeed.fulfilled, (state, action) => {
+                state.posts = [ ...action.payload.item ]
+                state.message = action.payload.message
+            })
+            .addCase(getMyFeed.rejected, (state, action) => {
+                state.isError = true
+                state.message = action.payload
+            })
+            .addCase(getMyFeed.pending, (state) => {
                 state.isLoading = true
                 state.message = ''
             })

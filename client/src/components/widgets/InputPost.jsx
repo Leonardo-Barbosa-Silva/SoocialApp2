@@ -1,13 +1,41 @@
 import { useTheme } from '@emotion/react';
-import { AttachFileOutlined, GifBoxOutlined, ImageOutlined, MicOutlined } from '@mui/icons-material';
+import { AttachFileOutlined, EditOutlined, GifBoxOutlined, ImageOutlined, MicOutlined } from '@mui/icons-material';
 import { Box, Button, Divider, InputBase, Typography } from '@mui/material';
 import UserImage from 'components/UserImage';
+import { useState } from 'react';
+import Dropzone from 'react-dropzone';
+import { useDispatch } from 'react-redux';
+import { postService } from '../../features/post/postService';
+
+const { createPost } = postService;
 
 
-
-const InputPost = ({ user }) => {
+const InputPost = ({ user, onCreatePost }) => {
     const { picturePath } = user
     const { palette } = useTheme()
+    const dispatch = useDispatch()
+    const [ openInputImgPost, setOpenInputImgPost ] = useState(false)
+    const [ imagePost, setImagePost ] = useState(null)
+    const [ descriptionPost, setDescriptionPost ] = useState("")
+
+    const handlePost = () => {
+        const formData = new FormData()
+
+        if (descriptionPost || imagePost) {
+            formData.append('description', descriptionPost)
+            if (imagePost) {
+                formData.append('picture', imagePost)
+                formData.append('picturePath', imagePost.name)
+            }
+
+            dispatch(createPost(formData)).then( () => {
+                if (onCreatePost) {
+                    onCreatePost()
+                }
+            })
+        }
+    }
+
 
     return (
         <Box
@@ -36,15 +64,60 @@ const InputPost = ({ user }) => {
                     padding="5px 20px"
                     backgroundColor={palette.neutral.light}
                 >
-                    <InputBase placeholder="What's on your mind?" sx={{ fontWeight: 400, fontSize: "15px" }}/>
+                    <InputBase
+                        placeholder="What's on your mind?"
+                        sx={{ fontWeight: 400, fontSize: "15px" }}
+                        onChange={(e) => setDescriptionPost(e.target.value)}
+                        value={descriptionPost}
+                    />
                 </Box>
             </Box>
 
-            <Divider />
+            {openInputImgPost && (
+                <Dropzone
+                    accepedFiles=".jpg,.png,.jpeg"
+                    multiple={false}
+                    onDrop={(acceptedFiles) => setImagePost(acceptedFiles[0])}
+                >
+                    {({ getRootProps, getInputProps }) => (
+                        <Box
+                            {...getRootProps()}
+                            height="100px"
+                            width="100%"
+                            border={`2px dashed${palette.primary.main}`}
+                            sx={{ "&:hover": { cursor: "pointer" } }}
+                        >
+                            <input {...getInputProps()}/>
+                            <Box
+                                height="100%"
+                                width="100%"
+                                display="flex"
+                                justifyContent="center"
+                                alignItems="center"
+                            >
+                                {!imagePost ? (
+                                    <Typography>Add a picture here!</Typography>
+                                ) : (
+                                    <Box
+                                        width="50%"
+                                        display="flex"
+                                        justifyContent="space-evenly"
+                                    >
+                                        <Typography>{imagePost.name}</Typography>
+                                        <EditOutlined />
+                                    </Box>
+                                )}
+                            </Box>
+                        </Box>
+                    )}
+                </Dropzone>
+            )}
+
+            {!openInputImgPost && <Divider />}
 
             <Box
                 width="100%"
-                height="100%"
+                height={openInputImgPost ? "fit-content" : "100%"}
                 display="flex"
                 alignItems="center"
                 justifyContent="space-between"
@@ -55,6 +128,7 @@ const InputPost = ({ user }) => {
                     alignItems="center"
                     p="5px"
                     borderRadius="5px"
+                    onClick={() => setOpenInputImgPost(!openInputImgPost)}
                     sx={{
                         "&:hover": {
                             cursor: "pointer",
@@ -110,7 +184,11 @@ const InputPost = ({ user }) => {
                     <MicOutlined sx={{ fontSize: "20px" }}/>
                     <Typography fontSize="15px">Audio</Typography>
                 </Box>
-                <Button>POST</Button>
+                <Button
+                    onClick={handlePost}
+                >
+                    POST
+                </Button>
             </Box>
         </Box>
     )
